@@ -1,0 +1,153 @@
+# Production Screener Configuration
+# All parameters are configurable for easy tuning
+
+# Market Configuration
+market:
+  timezone: "Asia/Kolkata"
+  pre_market_start: "09:00"
+  pre_market_end: "09:15"
+  market_open: "09:15"
+  market_close: "15:30"
+
+# Universe Configuration
+universe:
+  stocks:
+    - "RELIANCE.NS"
+    - "TCS.NS"
+    - "HDFCBANK.NS"
+    - "INFY.NS"
+    - "ICICIBANK.NS"
+    - "HINDUNILVR.NS"
+    - "ITC.NS"
+    - "SBIN.NS"
+    - "BHARTIARTL.NS"
+    - "KOTAKBANK.NS"
+    - "LT.NS"
+    - "AXISBANK.NS"
+    - "ASIANPAINT.NS"
+    - "MARUTI.NS"
+    - "BAJFINANCE.NS"
+    - "HCLTECH.NS"
+    - "WIPRO.NS"
+    - "ULTRACEMCO.NS"
+    - "ONGC.NS"
+    - "SUNPHARMA.NS"
+    - "TITAN.NS"
+    - "NESTLEIND.NS"
+    - "NTPC.NS"
+    - "TATAMOTORS.NS"
+    - "POWERGRID.NS"
+    - "M&M.NS"
+    - "BAJAJFINSV.NS"
+    - "TECHM.NS"
+    - "ADANIPORTS.NS"
+    - "DIVISLAB.NS"
+    - "TATASTEEL.NS"
+    - "COALINDIA.NS"
+    - "HINDALCO.NS"
+    - "JSWSTEEL.NS"
+    - "GRASIM.NS"
+    - "INDUSINDBK.NS"
+    - "DRREDDY.NS"
+    - "CIPLA.NS"
+    - "EICHERMOT.NS"
+    - "HEROMOTOCO.NS"
+    - "APOLLOHOSP.NS"
+    - "BRITANNIA.NS"
+    - "BPCL.NS"
+    - "TATACONSUM.NS"
+    - "SBILIFE.NS"
+    - "LTIM.NS"
+    - "ADANIENT.NS"
+    - "BAJAJ-AUTO.NS"
+    - "HDFCLIFE.NS"
+    - "SHRIRAMFIN.NS"
+  indices:
+    - "^NSEI"      # NIFTY 50
+    - "^NSEBANK"   # BANK NIFTY
+
+# Pre-Market Screener Parameters
+pre_market:
+  gap:
+    min_percent: 0.3
+    max_percent: 2.0
+  liquidity:
+    min_avg_volume: 100000
+    volume_lookback_days: 20
+    min_preopen_volume_ratio: 0.5  # 50% of average daily volume
+  max_candidates: 8
+
+# Index Context Parameters
+index_context:
+  ema_fast: 50
+  ema_slow: 200
+  trend_threshold: 0.005  # 0.5% difference for sideways
+
+# Live Market Filter Parameters
+live_market:
+  interval: "5m"
+  ema_fast: 20
+  ema_slow: 200
+  volume:
+    lookback_candles: 10
+    min_ratio: 1.0
+  range:
+    min_percent: 0.8
+  location:
+    proximity_percent: 0.5  # Within 0.5% of key level
+  max_candidates: 4
+
+# Signal Generation Parameters
+signals:
+  buy:
+    require_above_200ema: true
+    require_above_vwap: true
+    pullback_to_20ema_percent: 0.5
+    min_volume_ratio: 1.0
+    reversal_patterns:
+      - "hammer"
+      - "engulfing"
+      - "bullish_candle"
+  sell:
+    require_below_200ema: true
+    require_below_vwap: true
+    pullback_to_20ema_percent: 0.5
+    min_volume_ratio: 1.0
+    reversal_patterns:
+      - "shooting_star"
+      - "engulfing"
+      - "bearish_candle"
+
+# Risk Management Parameters
+risk:
+  capital: 100000
+  risk_per_trade_percent: 1.0
+  max_trades_per_day: 3
+  max_consecutive_losses: 2
+  stop_loss:
+    method: "atr"  # or "swing"
+    atr_multiplier: 1.5
+    atr_period: 14
+  target:
+    risk_reward_ratio: 2.0
+
+# Backtester Parameters
+backtest:
+  initial_capital: 100000
+  commission_percent: 0.03  # 0.03% per trade
+  slippage_percent: 0.05    # 0.05% slippage
+
+# Data Source Configuration
+data:
+  source: "csv"  # "csv" or "api"
+  csv:
+    minute_data_dir: "data/sample/minute"
+    daily_data_dir: "data/sample/daily"
+    news_file: "data/sample/news.csv"
+  date_format: "%Y-%m-%d %H:%M:%S"
+
+# Logging Configuration
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/screener.log"
