@@ -91,11 +91,14 @@ def run_pre_market_screening():
     return candidates
 
 
-def run_live_market_filtering(candidates: list):
+def run_live_market_filtering(candidates: list, demo_mode: bool = False):
     """Run live market filtering (After 9:20 AM)"""
     print("\n📊 Starting Live Market Filtering...")
 
-    filter = LiveMarketFilter()
+    if demo_mode:
+        print("⚙️  Demo Mode: Will use daily data if intraday data unavailable\n")
+
+    filter = LiveMarketFilter(demo_mode=demo_mode)
     final_candidates = filter.run_filtering(candidates)
 
     return final_candidates
@@ -137,6 +140,9 @@ Examples:
 
   # Full screening with ML predictions
   python main.py --mode full --capital 100000 --use-ml
+
+  # Demo mode (use daily data when intraday unavailable)
+  python main.py --mode full --capital 100000 --demo
         """
     )
 
@@ -159,6 +165,12 @@ Examples:
         '--use-ml',
         action='store_true',
         help='Use ML predictions for ranking (requires trained model)'
+    )
+
+    parser.add_argument(
+        '--demo',
+        action='store_true',
+        help='Demo mode: use daily data when intraday data unavailable (for testing/backtesting)'
     )
 
     args = parser.parse_args()
@@ -190,7 +202,7 @@ Examples:
             candidates = run_pre_market_screening()
 
             if candidates:
-                final_candidates = run_live_market_filtering(candidates)
+                final_candidates = run_live_market_filtering(candidates, demo_mode=args.demo)
 
                 if final_candidates:
                     # Initialize risk manager
@@ -217,7 +229,7 @@ Examples:
                 return
 
             # Step 2: Live market filtering
-            final_candidates = run_live_market_filtering(candidates)
+            final_candidates = run_live_market_filtering(candidates, demo_mode=args.demo)
 
             if not final_candidates:
                 print("\n❌ No candidates passed live market filtering. Exiting.")

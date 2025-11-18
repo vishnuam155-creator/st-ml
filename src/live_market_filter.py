@@ -18,11 +18,12 @@ class LiveMarketFilter:
     Uses trend, volume, range, and location filters
     """
 
-    def __init__(self, config: dict = None):
+    def __init__(self, config: dict = None, demo_mode: bool = False):
         self.config = config or TRADING_CONFIG
         self.data_fetcher = DataFetcher()
         self.tech_indicators = TechnicalIndicators()
         self.final_candidates = []
+        self.demo_mode = demo_mode  # Use daily data fallback when True
 
     def apply_trend_filter(self, candidates: List[Dict]) -> List[Dict]:
         """
@@ -49,6 +50,11 @@ class LiveMarketFilter:
             try:
                 # Get 5-min intraday data
                 data = self.data_fetcher.get_intraday_data(symbol, interval='5m')
+
+                # Fallback to daily data if intraday not available
+                if (data.empty or len(data) < 50) and self.demo_mode:
+                    print(f"  📝 {symbol}: Using daily data (intraday not available)")
+                    data = self.data_fetcher.get_historical_data(symbol, period='3mo', interval='1d')
 
                 if data.empty or len(data) < 50:
                     print(f"  ⚠️  {symbol}: Insufficient data")
